@@ -37,17 +37,53 @@ Esta API permite:
 
 ## 🔒 Lógica de Autenticación y Roles
 
-| Acción | Endpoint | Roles permitidos |
-|--------|-----------|------------------|
-| Crear usuario | `POST /api/User/Create` | Todos |
-| Iniciar sesión | `POST /api/User/Login` | Todos |
-| Obtener lista de usuarios | `GET /api/User/GetAll` | admin |
-| Obtener usuario por ID | `GET /api/User/Get/{id}` | admin |
-| Actualizar email | `PATCH /api/User/ActualizarEmail/{id}/{email}` | Todos |
-| Eliminar cuenta | `DELETE /api/User/Delete` | Todos |
-| Ver objetos | `GET /api/Objeto/GetAll` | Todos |
-| Crear / Eliminar objeto | `POST /api/Objeto/Create`, `DELETE /api/Objeto/Delete` | admin, modd |
-| Actualizar objeto | `PATCH /api/Objeto/ActualizarNombre/{id}/{name}` | admin, modd |
+| Acción | Endpoint | Roles permitidos | Requiere Token |
+|--------|-----------|------------------|----------------|
+| Crear usuario | `POST /api/User/Register` | Todos | No |
+| Iniciar sesión | `POST /api/User/Login` | Todos | No |
+| Eliminar usuario | `DELETE /api/User/DeleteMyAccount` | Todos | Sí |
+
+### 📦 Organization
+
+| Acción | Endpoint | Roles permitidos | Requiere Token |
+|--------|-----------|------------------|----------------|
+| Ver mis Organizaciones Creadas | `GET /api/Organization/MyOrganizations` | Todos | Sí |
+| Obtener usuario por ID | `GET /api/User/Get/{id}` | admin | Sí |
+| Actualizar email | `PATCH /api/User/ActualizarEmail/{id}/{email}` | Todos | Sí |
+| Eliminar cuenta | `DELETE /api/User/Delete` | Todos | Sí |
+| Ver objetos | `GET /api/Objeto/GetAll` | Todos | Sí |
+| Crear / Eliminar objeto | `POST /api/Objeto/Create`, `DELETE /api/Objeto/Delete` | admin, modd | Sí |
+| Actualizar objeto | `PATCH /api/Objeto/ActualizarNombre/{id}/{name}` | admin, modd | Sí |
+
+### 📦 Movement
+
+| Acción | Endpoint | Roles permitidos | Requiere Token |
+|--------|-----------|------------------|----------------|
+| Ver movimientos por organización | `GET /api/Movement/MyMovements/{OrgId}` | admin, user | Sí |
+| Crear movimiento | `POST /api/Movement/Create/{OrgId}` | admin, user | Sí |
+| Calcular balance | `GET /api/Movement/CalculateBalance/{OrgId}` | admin, user | Sí |
+| Actualizar movimiento | `PUT /api/Movement/Update/{OrgId}/{NoMov}` | admin, user | Sí |
+| Eliminar movimiento | `DELETE /api/Movement/Delete/{OrgId}/{NoMov}` | admin, user | Sí |
+| Eliminar todos los movimientos | `DELETE /api/Movement/DeleteAllMovements/{OrgId}` | admin | Sí |
+
+### 🏢 Organization
+
+| Acción | Endpoint | Roles permitidos | Requiere Token |
+|--------|-----------|------------------|----------------|
+| Ver mis organizaciones | `GET /api/Organization/MyOrganizations` | admin, user | Sí |
+| Crear organización | `POST /api/Organization/Create` | admin | Sí |
+| Actualizar contraseña | `PUT /api/Organization/UpdatePassword/{orgId}/{newPassword}` | admin | Sí |
+| Iniciar sesión en organización | `POST /api/Organization/Login` | Todos | No |
+| Eliminar organización | `DELETE /api/Organization/Delete/{orgId}` | admin | Sí |
+
+### 👥 Employee
+
+| Acción | Endpoint | Roles permitidos | Requiere Token |
+|--------|-----------|------------------|----------------|
+| Ver miembros de organización | `GET /api/Employee/Members/{OrgId}` | admin, user | Sí |
+| Agregar miembro | `POST /api/Employee/AddMember/{OrgId}` | admin | Sí |
+| Actualizar rol de miembro | `PUT /api/Employee/UpdateRoleMember/{OrgId}` | admin | Sí |
+| Eliminar miembro | `DELETE /api/Employee/RemoveMember/{OrgId}` | admin | Sí |
 
 **Roles soportados:**
 - `Owner`
