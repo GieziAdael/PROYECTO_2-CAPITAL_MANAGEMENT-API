@@ -169,6 +169,10 @@ Desarrollo de esta práctica desde cero para reforzar conceptos de:
 2. La responsabilidad de cada capa.
 3. La forma segura en que se autentica y autoriza el acceso.
 
+📅 **Ultimas novedades:** 
+1. Se desarrollo la API REST con 33 repositorios y 18 endpoints, subiendolo a GitHub el día 06/11/2025
+2. Se implemento una enpoint faltante, quedando en total 19 endpoints, se implemento caché con middleware y documentacion el día 07/11/2025
+
 ---
 
 ## 🧑‍💻 Autor
