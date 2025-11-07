@@ -60,7 +60,7 @@ Esta API permite:
 | Ver mis organizaciones | `GET /api/Organization/MyOrganizations` | Todos | Sí |
 | Crear organización | `POST /api/Organization/Create` | Owner | Sí |
 | Actualizar contraseña | `PUT /api/Organization/UpdatePassword/{orgId}/{newPassword}` | Owner | Sí |
-| Iniciar sesión en organización | `POST /api/Organization/Login` | Owner, Admin, Viewer | No |
+| Iniciar sesión en organización | `POST /api/Organization/Login` | Owner, Admin, Viewer | Si |
 | Eliminar organización | `DELETE /api/Organization/Delete/{orgId}` | Owner | Sí |
 
 ### 👥 Employee
