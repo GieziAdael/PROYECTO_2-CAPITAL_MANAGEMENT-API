@@ -1,0 +1,6 @@
+@API_CAPITAL_MANAGEMENT_HostAddress = http://localhost:5072
+
+GET {{API_CAPITAL_MANAGEMENT_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
