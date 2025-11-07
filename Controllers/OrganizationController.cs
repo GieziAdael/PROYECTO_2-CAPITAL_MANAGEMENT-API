@@ -12,6 +12,18 @@ using System.ComponentModel.DataAnnotations;
 
 namespace API_CAPITAL_MANAGEMENT.Controllers
 {
+    /// <summary>
+    /// Provides endpoints for managing organizations, including creating, updating, deleting, and retrieving
+    /// organizations, as well as handling organization login and membership.
+    /// </summary>
+    /// <remarks>This controller is designed to handle organization-related operations for authenticated
+    /// users.  It includes functionality for creating new organizations, retrieving a user's organizations, updating
+    /// organization details, and managing organization memberships.  The controller enforces authorization for all
+    /// endpoints, ensuring that only authenticated users can access the operations.  Additionally, certain actions,
+    /// such as updating or deleting an organization, require the user to have specific roles (e.g., "Owner") within the
+    /// organization.  Common validation rules are applied to ensure data integrity, such as checking for non-empty
+    /// names and passwords, enforcing password length requirements, and verifying the existence of organizations before
+    /// performing operations.</remarks>
     [Route("api/[controller]")]
     [ApiController]
     public class OrganizationController : ControllerBase
@@ -21,6 +33,13 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
         private readonly IMovementRepo _movementRepo;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OrganizationController"/> class.
+        /// </summary>
+        /// <param name="organizationRepo">The repository used to manage organization-related data.</param>
+        /// <param name="employeeRepo">The repository used to manage employee-related data.</param>
+        /// <param name="movementRepo">The repository used to manage movement-related data.</param>
+        /// <param name="mapper">The object mapper used to map between domain models and DTOs.</param>
         public OrganizationController
             (IOrganizationRepo organizationRepo,IEmployeeRepo employeeRepo, IMovementRepo movementRepo ,IMapper mapper)
         {
@@ -30,8 +49,19 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Retrieves a list of organizations associated with the currently authenticated user.
+        /// </summary>
+        /// <remarks>This method requires the user to be authenticated and authorized. The organizations
+        /// returned are specific to the user identified by the token in the request. The response is cached for 10
+        /// seconds to improve performance.</remarks>
+        /// <returns>An <see cref="IActionResult"/> containing a list of organizations associated with the user in the form of a
+        /// collection of <see cref="Organization"/> objects, with a status code of <see
+        /// cref="StatusCodes.Status200OK"/>. If the request is invalid, a status code of <see
+        /// cref="StatusCodes.Status400BadRequest"/> is returned.</returns>
         [Authorize]
-        [HttpGet("MyOrganizations")]
+        [HttpGet("MyOrganizations", Name = "GetAllMyOrginations")]
+        [ResponseCache(Duration = 10)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAllOrganizations()
@@ -39,11 +69,26 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
             int TokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
 
             var organizations = await _organizationRepo.GetAllMyOrginations(TokenId);
-            var organizationsDto = _mapper.Map<List<Organization>>(organizations);
+            var organizationsDto = _mapper.Map<List<FB_ListOrganizationsDto>>(organizations);
             return Ok(organizationsDto);
         }
 
-        //Create a new organization for  user
+        /// <summary>
+        /// Registers a new organization and assigns the current user as the owner of the organization.
+        /// </summary>
+        /// <remarks>The following validation rules apply: <list type="bullet"> <item><description>The
+        /// organization's name and password cannot be null or empty.</description></item> <item><description>The
+        /// organization's password must be at least 8 characters long.</description></item> <item><description>The
+        /// organization's name must not exceed 150 characters.</description></item> <item><description>The
+        /// organization's name must be unique.</description></item> </list> This method requires the user to be
+        /// authenticated and authorized. The authenticated user's ID is used to associate the user as the owner of the
+        /// newly created organization.</remarks>
+        /// <param name="createOrgDto">An object containing the details of the organization to be created, including the organization's name and
+        /// password.</param>
+        /// <returns>A <see cref="Task{IActionResult}"/> representing the result of the operation.  Returns: <list type="bullet">
+        /// <item><description><see cref="StatusCodes.Status201Created"/> if the organization is successfully
+        /// created.</description></item> <item><description><see cref="StatusCodes.Status400BadRequest"/> if the input
+        /// data is invalid or the organization name is already in use.</description></item> </list></returns>
         [Authorize]
         [HttpPost("Create")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -107,7 +152,18 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
             });
         }
 
-        //Update password organization
+        /// <summary>
+        /// Updates the password for the specified organization.
+        /// </summary>
+        /// <remarks>This method requires the user to be authorized and to have the "Owner" role for the
+        /// specified organization.  The user must also belong to the organization being updated. If the organization
+        /// does not exist, or if the  user does not have the required permissions, the method will return a bad request
+        /// response.</remarks>
+        /// <param name="orgId">The unique identifier of the organization whose password is being updated. Must be greater than 0.</param>
+        /// <param name="newPassword">The new password to set for the organization. Must be at least 8 characters long.</param>
+        /// <returns>An <see cref="IActionResult"/> indicating the result of the operation.  Returns <see
+        /// cref="StatusCodes.Status200OK"/> if the password is successfully updated, or  <see
+        /// cref="StatusCodes.Status400BadRequest"/> if the input is invalid or the operation fails.</returns>
         [Authorize]
         [HttpPut("UpdatePassword/{orgId:int}/{newPassword}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -147,7 +203,17 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
             return Ok(organization);
         }
 
-        //Login organization
+        /// <summary>
+        /// Authenticates an organization based on the provided credentials.
+        /// </summary>
+        /// <remarks>This method requires the caller to be authorized. Ensure that the provided
+        /// credentials are valid  and that the user is a member of the organization before calling this
+        /// method.</remarks>
+        /// <param name="fB_LoginOrgDto">An object containing the organization's login credentials, including the organization's name and password.</param>
+        /// <returns>An <see cref="IActionResult"/> representing the result of the operation.  Returns <see
+        /// cref="StatusCodes.Status200OK"/> if the authentication is successful,  or <see
+        /// cref="StatusCodes.Status400BadRequest"/> if the credentials are invalid,  the user is not a member of the
+        /// organization, or required fields are missing.</returns>
         [Authorize]
         [HttpPost("Login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -173,6 +239,18 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
             return Ok(organization);
         }
 
+        /// <summary>
+        /// Deletes an organization and all its associated data, including employees and movements.
+        /// </summary>
+        /// <remarks>This operation requires the user to be authorized and to have the "Owner" role within
+        /// the organization being deleted.  All employees and movements associated with the organization will also be
+        /// deleted as part of this operation.</remarks>
+        /// <param name="orgId">The unique identifier of the organization to delete. Must be a positive integer.</param>
+        /// <returns>An <see cref="IActionResult"/> indicating the result of the operation. Returns: <list type="bullet">
+        /// <item><description><see cref="StatusCodes.Status200OK"/> if the organization is successfully
+        /// deleted.</description></item> <item><description><see cref="StatusCodes.Status400BadRequest"/> if the
+        /// organization does not exist, the user lacks permissions, or the input is invalid.</description></item>
+        /// </list></returns>
         [Authorize]
         [HttpDelete("Delete/{orgId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]

@@ -5,14 +5,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API_CAPITAL_MANAGEMENT.Repositories
 {
+    /// <summary>
+    /// Repository for Employee operations
+    /// </summary>
     public class EmployeeRepo : IEmployeeRepo
     {
         private readonly MyAppDbContext _context;
 
+        /// <summary>
+        /// Constructor for EmployeeRepo
+        /// </summary>
+        /// <param name="context"></param>
         public EmployeeRepo(MyAppDbContext context)
         {
             _context = context;
         }
+        /// <summary>
+        /// Method to get the role of a user in a specific organization
+        /// </summary>
+        /// <param name="UserId"></param>
+        /// <param name="OrgId"></param>
+        /// <returns></returns>
         public async Task<string> WhatThisRole(int UserId, int OrgId)
         {
             var register = await _context.Employees.FirstOrDefaultAsync(u => u.UserId == UserId && u.OrganizationId == OrgId);
@@ -22,6 +35,12 @@ namespace API_CAPITAL_MANAGEMENT.Repositories
             }
             return register.Role;
         }
+        /// <summary>
+        /// Method to check if an employee exists in an organization by email
+        /// </summary>
+        /// <param name="orgId"></param>
+        /// <param name="email"></param>
+        /// <returns></returns>
         public async Task<bool> ExistsByEmailToOrg(int orgId, string email)
         {
             var emailN = email.ToLower().Trim();
@@ -29,13 +48,22 @@ namespace API_CAPITAL_MANAGEMENT.Repositories
             if(emailId == null) return false;
             return await _context.Employees.AnyAsync(u => u.OrganizationId == orgId && u.UserId == emailId.Id);
         }
+        /// <summary>
+        /// Method to get an employee by user ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<Employee> GetByIdUserEmployee(int id)
         {
             var registro = await _context.Employees.FirstOrDefaultAsync(u =>u.UserId == id);
             if (registro == null) return null;
             return registro;
         }
-
+        /// <summary>
+        /// Method to get a user by email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
         public async Task<User> GetByIdUserEmployee(string email)
         {
             var emailN = email.ToLower().Trim();
@@ -44,37 +72,66 @@ namespace API_CAPITAL_MANAGEMENT.Repositories
             if(register == null) return null;
             return register;
         }
+        /// <summary>
+        /// Method to add a new employee to an organization
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
         public async Task<bool> NewEmployeeToOrg(Employee employee)
         {
             await _context.Employees.AddAsync(employee);
             await _context.SaveChangesAsync();
             return true;
         }
+        /// <summary>
+        /// Method to update the role of an employee in an organization
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
         public async Task<bool> PatchRoleEmployeeToOrg(Employee employee)
         {
             _context.Employees.UpdateRange(employee);
             await _context.SaveChangesAsync();
             return true;
         }
+        /// <summary>
+        /// Method to delete an employee from an organization
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
         public async Task<bool> DeleteEmployeeToOrg(Employee employee)
         {
             _context.Employees.Remove(employee);
             await _context.SaveChangesAsync();
             return true;
         }
-
+        /// <summary>
+        /// Method to check if a user is a member of an organization
+        /// </summary>
+        /// <param name="UserId"></param>
+        /// <param name="OrgId"></param>
+        /// <returns></returns>
         public async Task<bool> IsMember(int UserId, int OrgId)
         {
             return await _context.Employees.AnyAsync(u => u.UserId == UserId && u.OrganizationId == OrgId);
         }
-
+        /// <summary>
+        /// Method to get members by organization ID
+        /// </summary>
+        /// <param name="OrgId"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<Employee>> GetMembersByOrganizationId(int OrgId)
         {
             return await _context.Employees.Include(e => e.User)
                 .Where(e => e.OrganizationId == OrgId)
                 .ToListAsync();
         }
-
+        /// <summary>
+        /// Method to get an employee by email in a specific organization
+        /// </summary>
+        /// <param name="orgId"></param>
+        /// <param name="email"></param>
+        /// <returns></returns>
         public async Task<Employee> BodyByEmailToOrg(int orgId, string email)
         {
             var emailN = email.ToLower().Trim();

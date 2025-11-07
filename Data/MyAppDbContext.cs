@@ -3,18 +3,41 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API_CAPITAL_MANAGEMENT.Data
 {
+    /// <summary>
+    /// Database context for MyApp, managing entities and relationships.
+    /// </summary>
     public class MyAppDbContext : DbContext
     {
+        /// <summary>
+        /// Constructor for MyAppDbContext
+        /// </summary>
+        /// <param name="options"></param>
         public MyAppDbContext(DbContextOptions<MyAppDbContext> options) :base(options)
         {
             
         }
 
+        /// <summary>
+        /// Entity set for Users.
+        /// </summary>
         public DbSet<User> Users { get; set; }
+        /// <summary>
+        /// Entity set for Organizations.
+        /// </summary>
         public DbSet<Organization> Organizations { get; set; }
+        /// <summary>
+        /// Entity set for Employees.
+        /// </summary>
         public DbSet<Employee> Employees { get; set; }
+        /// <summary>
+        /// Entity set for Movements.
+        /// </summary>
         public DbSet<Movement> Movements { get; set; }
 
+        /// <summary>
+        /// Provides configuration for the entity relationships and constraints.
+        /// </summary>
+        /// <param name="modelBuilder"></param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API_CAPITAL_MANAGEMENT.Controllers
 {
+    /// <summary>
+    /// This controller manages employee-related operations within organizations.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class EmployeeController : ControllerBase
@@ -15,14 +18,25 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
         private readonly IEmployeeRepo _employeeRepo;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Constructor for EmployeeController
+        /// </summary>
+        /// <param name="employeeRepo"></param>
+        /// <param name="mapper"></param>
         public EmployeeController(IEmployeeRepo employeeRepo, IMapper mapper)
         {
             _employeeRepo = employeeRepo;
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// This endpoint retrieves all members of a specified organization.
+        /// </summary>
+        /// <param name="OrgId"></param>
+        /// <returns></returns>
         [Authorize]
-        [HttpGet("Members/{OrgId:int}")]
+        [HttpGet("Members/{OrgId:int}", Name = "GetMembersByOrganizationId")]
+        [ResponseCache(Duration = 10)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetMembersOfOrganization(int OrgId)
@@ -41,6 +55,12 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
             return Ok(membersDto);
         }
 
+        /// <summary>
+        /// This endpoint adds a new member to a specified organization.
+        /// </summary>
+        /// <param name="OrgId"></param>
+        /// <param name="addMemberDto"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpPost("AddMember/{OrgId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -78,6 +98,12 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
             return CreatedAtAction(nameof(AddMemberToOrganization), new { id = register.Id }, register);
         }
 
+        /// <summary>
+        /// This endpoint updates the role of an existing member in a specified organization.
+        /// </summary>
+        /// <param name="OrgId"></param>
+        /// <param name="updateRoleDto"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpPut("UpdateRoleMember/{OrgId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -114,6 +140,13 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
             return Ok(register);
         }
 
+
+        /// <summary>
+        /// This endpoint removes a member from a specified organization.
+        /// </summary>
+        /// <param name="OrgId"></param>
+        /// <param name="email"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpDelete("RemoveMember/{OrgId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]

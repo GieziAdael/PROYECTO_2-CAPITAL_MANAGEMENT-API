@@ -10,25 +10,48 @@ using System.Text;
 
 namespace API_CAPITAL_MANAGEMENT.Repositories
 {
+    /// <summary>
+    /// Repository for managing User entities
+    /// </summary>
     public class UserRepo : IUserRepo
     {
         private readonly MyAppDbContext _context;
         private string? secretKey;
 
+        /// <summary>
+        /// Constructor for UserRepo
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="configuration"></param>
         public UserRepo(MyAppDbContext context, IConfiguration configuration)
         {
             _context = context;
             secretKey = configuration.GetValue<string>("ApiSettings:SecretKey");
         }
+        /// <summary>
+        /// Method to check if a user exists by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<bool> ExistsById(int id)
         {
             return await _context.Users.AnyAsync(u => u.Id == id);
         }
+        /// <summary>
+        /// Method to check if a user exists by email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
         public async Task<bool> ExistsByEmail(string email)
         {
             var emailN = email.ToLower().Trim();
             return await _context.Users.AnyAsync(u => u.EmailNormalized.Trim().ToLower() == emailN);
         }
+        /// <summary>
+        /// Method to get a user by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<User> GetById(int id)
         {
             var registro = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
@@ -38,6 +61,11 @@ namespace API_CAPITAL_MANAGEMENT.Repositories
             }
             return registro;
         }
+        /// <summary>
+        /// Method to create a new user
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public async Task<bool> NewUser(User user)
         {
             user.EmailNormalized = user.EmailNormalized.Trim().ToLower().Normalize();
@@ -46,18 +74,35 @@ namespace API_CAPITAL_MANAGEMENT.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+        /// <summary>
+        /// Method to update a user's password
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public async Task<bool> ActUserPassword(User user)
         {
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
             return true;
         }
+        /// <summary>
+        /// Method to delete a user
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public async Task<bool> DeleteUser(User user)
         {
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
             return true;
         }
+        /// <summary>
+        /// Method for user login
+        /// </summary>
+        /// <param name="userLoginDto"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         public async Task<UserLoginResponseDto> Login(UserLoginDto userLoginDto)
         {
             if (string.IsNullOrEmpty(userLoginDto.Email))
@@ -118,6 +163,10 @@ namespace API_CAPITAL_MANAGEMENT.Repositories
                 Message = "Usuario logeado correctamente"
             };
         }
+        /// <summary>
+        /// Method to get all users
+        /// </summary>
+        /// <returns></returns>
         public async Task<IEnumerable<User>> GetAllUsers()
         {
             return await _context.Users.ToListAsync();
