@@ -183,5 +183,6 @@ Desarrollo de esta práctica desde cero para reforzar conceptos de:
 💻 Backend Developer (.NET Junior)  
 🌐 Proyecto educativo: Implementación de Autenticación y Autorización JWT en APIs RESTful  
 📅 Noviembre 2025
+⏯️ https://www.youtube.com/watch?v=RU0sVjW-b4I
 
 ---
