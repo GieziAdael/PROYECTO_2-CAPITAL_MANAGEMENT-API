@@ -143,7 +143,7 @@ Esta API permite:
    ```
 6. Abre Swagger:
    ```
-   https://localhost:5001/swagger
+   https://localhost:5001/swagger/index.html
    ```
    Desde aquí puedes probar endpoints, generar tokens y autenticarlos.
 
