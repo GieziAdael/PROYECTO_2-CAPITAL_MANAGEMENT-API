@@ -5,7 +5,7 @@
 **Rol:** Backend Developer (.NET Junior)  
 **Correo:** giezi.tlaxcoapan@gmail.com  
 **Fecha:** Noviembre 2025  
-**VIDEO** https://www.youtube.com/watch?v=RU0sVjW-b4I
+**Video del Proyecto** https://www.youtube.com/watch?v=RU0sVjW-b4I
 
 ---
 
