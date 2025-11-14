@@ -5,6 +5,7 @@
 **Rol:** Backend Developer (.NET Junior)  
 **Correo:** giezi.tlaxcoapan@gmail.com  
 **Fecha:** Noviembre 2025  
+**VIDEO** https://www.youtube.com/watch?v=RU0sVjW-b4I
 
 ---
 
@@ -142,7 +143,7 @@ Esta API permite:
    ```
 6. Abre Swagger:
    ```
-   https://localhost:5001/swagger
+   https://localhost:5001/swagger/index.html
    ```
    Desde aquí puedes probar endpoints, generar tokens y autenticarlos.
 
@@ -169,6 +170,10 @@ Desarrollo de esta práctica desde cero para reforzar conceptos de:
 2. La responsabilidad de cada capa.
 3. La forma segura en que se autentica y autoriza el acceso.
 
+📅 **Ultimas novedades:** 
+1. Se desarrollo la API REST con 33 repositorios y 18 endpoints, subiendolo a GitHub el día 06/11/2025
+2. Se implemento una enpoint faltante, quedando en total 19 endpoints, se implemento caché con middleware y documentacion el día 07/11/2025
+
 ---
 
 ## 🧑‍💻 Autor
@@ -178,5 +183,6 @@ Desarrollo de esta práctica desde cero para reforzar conceptos de:
 💻 Backend Developer (.NET Junior)  
 🌐 Proyecto educativo: Implementación de Autenticación y Autorización JWT en APIs RESTful  
 📅 Noviembre 2025
+⏯️ https://www.youtube.com/watch?v=RU0sVjW-b4I
 
 ---
