@@ -44,17 +44,6 @@ Esta API permite:
 | Actualizar password | `PUT /api/User/ModifyMy/{newPassword}` | Todos | Sí |
 | Eliminar usuario | `DELETE /api/User/DeleteMyAccount` | Todos | Sí |
 
-### 📦 Movement
-
-| Acción | Endpoint | Roles permitidos | Requiere Token |
-|--------|-----------|------------------|----------------|
-| Ver movimientos por organización | `GET /api/Movement/MyMovements/{OrgId}` | Owner, Admin, Viewer | Sí |
-| Crear movimiento | `POST /api/Movement/Create/{OrgId}` | Owner, Admin | Sí |
-| Calcular balance | `GET /api/Movement/CalculateBalance/{OrgId}` | Owner, Admin, Viewer | Sí |
-| Actualizar movimiento | `PUT /api/Movement/Update/{OrgId}/{NoMov}` | Owner, Admin | Sí |
-| Eliminar movimiento | `DELETE /api/Movement/Delete/{OrgId}/{NoMov}` | Owner, Admin | Sí |
-| Eliminar todos los movimientos | `DELETE /api/Movement/DeleteAllMovements/{OrgId}` | Owner | Sí |
-
 ### 🏢 Organization
 
 | Acción | Endpoint | Roles permitidos | Requiere Token |
@@ -74,6 +63,17 @@ Esta API permite:
 | Agregar miembro | `POST /api/Employee/AddMember/{OrgId}` | Owner | Sí |
 | Actualizar rol de miembro | `PUT /api/Employee/UpdateRoleMember/{OrgId}` | Owner | Sí |
 | Eliminar miembro | `DELETE /api/Employee/RemoveMember/{OrgId}` | Owner | Sí |
+
+### 📦 Movement
+
+| Acción | Endpoint | Roles permitidos | Requiere Token |
+|--------|-----------|------------------|----------------|
+| Ver movimientos por organización | `GET /api/Movement/MyMovements/{OrgId}` | Owner, Admin, Viewer | Sí |
+| Crear movimiento | `POST /api/Movement/Create/{OrgId}` | Owner, Admin | Sí |
+| Calcular balance | `GET /api/Movement/CalculateBalance/{OrgId}` | Owner, Admin, Viewer | Sí |
+| Actualizar movimiento | `PUT /api/Movement/Update/{OrgId}/{NoMov}` | Owner, Admin | Sí |
+| Eliminar movimiento | `DELETE /api/Movement/Delete/{OrgId}/{NoMov}` | Owner, Admin | Sí |
+| Eliminar todos los movimientos | `DELETE /api/Movement/DeleteAllMovements/{OrgId}` | Owner | Sí |
 
 **Roles soportados:**
 - `Owner`
