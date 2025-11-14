@@ -41,6 +41,7 @@ Esta API permite:
 |--------|-----------|------------------|----------------|
 | Crear usuario | `POST /api/User/Register` | Todos | No |
 | Iniciar sesión | `POST /api/User/Login` | Todos | No |
+| Actualizar password | `PUT /api/User/ModifyMy/{newPassword}` | Todos | Sí |
 | Eliminar usuario | `DELETE /api/User/DeleteMyAccount` | Todos | Sí |
 
 ### 📦 Movement
@@ -59,6 +60,7 @@ Esta API permite:
 | Acción | Endpoint | Roles permitidos | Requiere Token |
 |--------|-----------|------------------|----------------|
 | Ver mis organizaciones | `GET /api/Organization/MyOrganizations` | Todos | Sí |
+| Ver mis afiliaciones | `GET /api/Organization/Others` | Todos | Sí |
 | Crear organización | `POST /api/Organization/Create` | Owner | Sí |
 | Actualizar contraseña | `PUT /api/Organization/UpdatePassword/{orgId}/{newPassword}` | Owner | Sí |
 | Iniciar sesión en organización | `POST /api/Organization/Login` | Owner, Admin, Viewer | Si |
@@ -170,9 +172,12 @@ Desarrollo de esta práctica desde cero para reforzar conceptos de:
 2. La responsabilidad de cada capa.
 3. La forma segura en que se autentica y autoriza el acceso.
 
-📅 **Ultimas novedades:** 
+📅 **Historial de novedades:** 
 1. Se desarrollo la API REST con 33 repositorios y 18 endpoints, subiendolo a GitHub el día 06/11/2025
 2. Se implemento una enpoint faltante, quedando en total 19 endpoints, se implemento caché con middleware y documentacion el día 07/11/2025
+
+📣**Ultimas novedades:** 
+1. Se implemento dos endpoints (Actualizar Password para el USUARIO y Obtener un listado de Organizaciones en las que el USUARIO se encuentra afilidado) el día 13/11/2025
 
 ---
 
