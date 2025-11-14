@@ -41,7 +41,7 @@ Esta API permite:
 |--------|-----------|------------------|----------------|
 | Crear usuario | `POST /api/User/Register` | Todos | No |
 | Iniciar sesión | `POST /api/User/Login` | Todos | No |
-| Actualizar password | `PUT /api/User/ModifyMy/{newPassword}` | Todos | Sí |
+| Actualizar password | `PUT /api/User/ModifyMyPassword/{newPassword}` | Todos | Sí |
 | Eliminar usuario | `DELETE /api/User/DeleteMyAccount` | Todos | Sí |
 
 ### 🏢 Organization
