@@ -52,9 +52,9 @@ namespace API_CAPITAL_MANAGEMENT.Data
             // ===== Employee - Organization =====
             modelBuilder.Entity<Employee>()
                 .HasOne(e => e.Organization)
-                .WithMany() // o .WithMany(o => o.Employees)
+                .WithMany(o => o.Employees) // o .WithMany(o => o.Employees)
                 .HasForeignKey(e => e.OrganizationId)
-                .OnDelete(DeleteBehavior.Restrict); // 🔹 evita cascada
+                .OnDelete(DeleteBehavior.Restrict);
 
             // ===== Organization - User =====
             modelBuilder.Entity<Organization>()

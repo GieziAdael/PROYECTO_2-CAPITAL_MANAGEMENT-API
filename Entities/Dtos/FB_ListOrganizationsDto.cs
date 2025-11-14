@@ -9,5 +9,9 @@
         /// Property representing the name of the organization.
         /// </summary>
         public string? NameOrganization { get; set; }
+        /// <summary>
+        /// Property representing the role within the organization.
+        /// </summary>
+        public string? RoleOrganization { get; set; }
     }
 }

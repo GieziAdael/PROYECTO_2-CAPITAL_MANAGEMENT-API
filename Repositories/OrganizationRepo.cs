@@ -102,7 +102,7 @@ namespace API_CAPITAL_MANAGEMENT.Repositories
         /// <returns></returns>
         public async Task<IEnumerable<Organization>> GetAllMyOrginations(int id)
         {
-            return await _context.Organizations.Where(c => c.UserId == id).ToListAsync();
+            return await _context.Organizations.Include(c => c.Employees).Where(c => c.UserId == id).ToListAsync();
         }
         /// <summary>
         /// Method to get an organization by its ID
@@ -111,12 +111,28 @@ namespace API_CAPITAL_MANAGEMENT.Repositories
         /// <returns></returns>
         public async Task<Organization> GetOrganizationById(int id)
         {
-            var registro = await _context.Organizations.FirstOrDefaultAsync(u => u.Id == id);
+            var registro = await _context.Organizations.FirstOrDefaultAsync(c => c.Id == id);
             if(registro == null)
             {
                 return null;
             }
             return registro;
+        }
+
+        /// <summary>
+        /// Devolver lista de organizaciones en las que me encuentro afilidado
+        /// </summary>
+        /// <param name="OrgId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<Organization>> GetAllOthersOrganizationsByOrgId(int TokenId)
+        {
+            return await _context.Organizations
+                .Include(c=>c.Employees)
+                .Where(c => 
+                    c.Employees.Any(e => e.UserId == TokenId) && //Im Employee
+                    c.UserId != TokenId //But, im not owner
+                )
+                .ToListAsync();
         }
     }
 }

@@ -15,7 +15,12 @@ namespace API_CAPITAL_MANAGEMENT.Mapper
         public OrganizationProfile()
         {
             CreateMap<Organization, FB_CreateOrgDto>().ReverseMap();
-            CreateMap<Organization, FB_ListOrganizationsDto>().ForMember(dest => dest.NameOrganization, opt => opt.MapFrom(src => src.NameOrg));
+            CreateMap<Organization, FB_ListOrganizationsDto>()
+    .ForMember(dest => dest.NameOrganization, opt => opt.MapFrom(src => src.NameOrg))
+    .ForMember(dest => dest.RoleOrganization, opt => opt.MapFrom((src, dest, destMember, context) =>
+        src.Employees
+           .FirstOrDefault(e => e.UserId == (int)context.Items["UserId"])
+           .Role));
         }
     }
 }

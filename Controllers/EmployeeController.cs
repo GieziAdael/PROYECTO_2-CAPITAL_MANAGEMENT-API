@@ -46,7 +46,7 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
             if(! await _employeeRepo.IsMember(tokenId, OrgId))
                 return BadRequest("No tienes acceso para ver los miembros de esta organización");
             string role = await _employeeRepo.WhatThisRole(tokenId, OrgId);
-            if(role != "Owner" && role != "Admin")
+            if(role != "Owner" && role != "Admin" && role != "Viewer")
                 return BadRequest("No tienes permisos para ver los miembros de esta organización");
             //Actions
             // Assuming there's a method to get members by organization ID
@@ -148,7 +148,7 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
         /// <param name="email"></param>
         /// <returns></returns>
         [Authorize]
-        [HttpDelete("RemoveMember/{OrgId:int}")]
+        [HttpDelete("RemoveMember/{OrgId:int}/{email}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

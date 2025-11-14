@@ -31,5 +31,10 @@ namespace API_CAPITAL_MANAGEMENT.Entities
         /// Property representing the associated User entity.
         /// </summary>
         public User? User { get; set; }
+
+        /// <summary>
+        /// Navegation property representing the collection of employees associated with the organization.
+        /// </summary>
+        public ICollection<Employee>? Employees { get; set; }
     }
 }

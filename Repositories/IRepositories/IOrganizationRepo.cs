@@ -57,5 +57,13 @@ namespace API_CAPITAL_MANAGEMENT.Repositories.IRepositories
         /// <param name="id"></param>
         /// <returns></returns>
         Task<Organization> GetOrganizationById(int id);
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="OrgId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<Organization>> GetAllOthersOrganizationsByOrgId(int TokenId);
     }
 }

@@ -224,9 +224,19 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
                 }
                 await _organizationRepo.DeleteOrg(orgs);
             }
+            //Remove me from the employees
+            var meEmployee = await _employeeRepo.SearchMeById(tokenId);
+            if(meEmployee is not null)
+                foreach (var emp in meEmployee)
+                {
+                    await _employeeRepo.DeleteEmployeeToOrg(emp);
+                }
 
             //Finally delete the user
-            await _userRepo.DeleteUser(user);
+            if (!await _userRepo.DeleteUser(user))
+            {
+                return BadRequest("Error al eliminar el usuario");
+            }
             return Ok("Cuenta eliminada exitosamente");
         }
     }

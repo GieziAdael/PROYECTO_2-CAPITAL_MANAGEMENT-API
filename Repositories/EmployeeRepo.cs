@@ -2,6 +2,7 @@
 using API_CAPITAL_MANAGEMENT.Entities;
 using API_CAPITAL_MANAGEMENT.Repositories.IRepositories;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 
 namespace API_CAPITAL_MANAGEMENT.Repositories
 {
@@ -53,9 +54,9 @@ namespace API_CAPITAL_MANAGEMENT.Repositories
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<Employee> GetByIdUserEmployee(int id)
+        public async Task<Employee> GetByIdUserEmployee(int id, int OrgId)
         {
-            var registro = await _context.Employees.FirstOrDefaultAsync(u =>u.UserId == id);
+            var registro = await _context.Employees.FirstOrDefaultAsync(u =>u.UserId == id && u.OrganizationId == OrgId);
             if (registro == null) return null;
             return registro;
         }
@@ -105,6 +106,12 @@ namespace API_CAPITAL_MANAGEMENT.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<IEnumerable<Employee>> SearchMeById(int TokenId)
+        {
+            return await _context.Employees.Where(c=>c.UserId == TokenId).ToListAsync();
+        }
+
         /// <summary>
         /// Method to check if a user is a member of an organization
         /// </summary>

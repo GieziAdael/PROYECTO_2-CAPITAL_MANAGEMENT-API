@@ -26,7 +26,7 @@ namespace API_CAPITAL_MANAGEMENT.Repositories.IRepositories
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<Employee> GetByIdUserEmployee(int id);
+        Task<Employee> GetByIdUserEmployee(int id, int OrgId);
         /// <summary>
         /// Method to get a user by email
         /// </summary>
@@ -51,6 +51,8 @@ namespace API_CAPITAL_MANAGEMENT.Repositories.IRepositories
         /// <param name="employee"></param>
         /// <returns></returns>
         Task<bool> DeleteEmployeeToOrg(Employee employee);
+
+        Task<IEnumerable<Employee>> SearchMeById(int TokenId);
 
         /// <summary>
         /// Method to check if a user is a member of an organization

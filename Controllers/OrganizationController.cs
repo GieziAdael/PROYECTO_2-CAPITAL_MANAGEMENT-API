@@ -69,8 +69,34 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
             int TokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
 
             var organizations = await _organizationRepo.GetAllMyOrginations(TokenId);
-            var organizationsDto = _mapper.Map<List<FB_ListOrganizationsDto>>(organizations);
+            var organizationsDto = _mapper.Map<List<FB_ListOrganizationsDto>>(
+                organizations,
+                opt => opt.Items["UserId"] = TokenId
+            );
             return Ok(organizationsDto);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("Others")]
+        [ResponseCache(Duration = 10)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetOtherOrganizations()
+        {
+            int TokenId = int.Parse(User.FindFirst("id")?.Value?? "0");
+
+            //Get all organizations by OrganizationId
+            var organizations = await _organizationRepo.GetAllOthersOrganizationsByOrgId(TokenId);
+            var organizationsDto = _mapper.Map<List<FB_ListOrganizationsDto>>(
+                organizations,
+                opt => opt.Items["UserId"] = TokenId
+            );
+            return Ok(organizationsDto);
+
         }
 
         /// <summary>
@@ -182,10 +208,10 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
 
             //Is the user owner of the organization?
             int tokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
-            var employee = await _employeeRepo.GetByIdUserEmployee(tokenId);
+            var employee = await _employeeRepo.GetByIdUserEmployee(tokenId, orgId);
             if(employee == null)
                 return BadRequest("No se encontro dicha organizacion");
-            if (employee.Role != "Owner" && employee.OrganizationId != orgId)
+            if (employee.Role != "Owner")
                 return BadRequest("No tienes permisos para actualizar la contraseña de esta organización");
 
             //Actions
@@ -200,7 +226,7 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
             if (! await _organizationRepo.PatchOrg(organization))
                 return BadRequest("Error al actualizar la contraseña de la organización");
 
-            return Ok(organization);
+            return Ok("Actualizado ;)");
         }
 
         /// <summary>
@@ -264,10 +290,10 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
                 return BadRequest("La organización no existe");
             //Is the user owner of the organization?
             int tokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
-            var employee = await _employeeRepo.GetByIdUserEmployee(tokenId);
+            var employee = await _employeeRepo.GetByIdUserEmployee(tokenId, orgId);
             if (employee == null)
-                return BadRequest("No se encontro dicha organizacion");
-            if (employee.Role != "Owner" && employee.OrganizationId != orgId)
+                return BadRequest("No se encontro el empleado");
+            if (employee.Role != "Owner")
                 return BadRequest("No tienes permisos para eliminar esta organización");
             //Actions
             var registro = await _organizationRepo.GetOrganizationById(orgId);
