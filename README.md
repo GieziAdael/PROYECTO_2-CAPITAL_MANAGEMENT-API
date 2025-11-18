@@ -5,7 +5,7 @@
 **Rol:** Backend Developer (.NET Junior)  
 **Correo:** giezi.tlaxcoapan@gmail.com  
 **Fecha:** Noviembre 2025  
-**VIDEO** https://www.youtube.com/watch?v=RU0sVjW-b4I
+**Video del Proyecto** https://www.youtube.com/watch?v=RU0sVjW-b4I
 
 ---
 
@@ -41,24 +41,15 @@ Esta API permite:
 |--------|-----------|------------------|----------------|
 | Crear usuario | `POST /api/User/Register` | Todos | No |
 | Iniciar sesión | `POST /api/User/Login` | Todos | No |
+| Actualizar password | `PUT /api/User/ModifyMyPassword/{newPassword}` | Todos | Sí |
 | Eliminar usuario | `DELETE /api/User/DeleteMyAccount` | Todos | Sí |
-
-### 📦 Movement
-
-| Acción | Endpoint | Roles permitidos | Requiere Token |
-|--------|-----------|------------------|----------------|
-| Ver movimientos por organización | `GET /api/Movement/MyMovements/{OrgId}` | Owner, Admin, Viewer | Sí |
-| Crear movimiento | `POST /api/Movement/Create/{OrgId}` | Owner, Admin | Sí |
-| Calcular balance | `GET /api/Movement/CalculateBalance/{OrgId}` | Owner, Admin, Viewer | Sí |
-| Actualizar movimiento | `PUT /api/Movement/Update/{OrgId}/{NoMov}` | Owner, Admin | Sí |
-| Eliminar movimiento | `DELETE /api/Movement/Delete/{OrgId}/{NoMov}` | Owner, Admin | Sí |
-| Eliminar todos los movimientos | `DELETE /api/Movement/DeleteAllMovements/{OrgId}` | Owner | Sí |
 
 ### 🏢 Organization
 
 | Acción | Endpoint | Roles permitidos | Requiere Token |
 |--------|-----------|------------------|----------------|
 | Ver mis organizaciones | `GET /api/Organization/MyOrganizations` | Todos | Sí |
+| Ver mis afiliaciones | `GET /api/Organization/Others` | Todos | Sí |
 | Crear organización | `POST /api/Organization/Create` | Owner | Sí |
 | Actualizar contraseña | `PUT /api/Organization/UpdatePassword/{orgId}/{newPassword}` | Owner | Sí |
 | Iniciar sesión en organización | `POST /api/Organization/Login` | Owner, Admin, Viewer | Si |
@@ -72,6 +63,17 @@ Esta API permite:
 | Agregar miembro | `POST /api/Employee/AddMember/{OrgId}` | Owner | Sí |
 | Actualizar rol de miembro | `PUT /api/Employee/UpdateRoleMember/{OrgId}` | Owner | Sí |
 | Eliminar miembro | `DELETE /api/Employee/RemoveMember/{OrgId}` | Owner | Sí |
+
+### 📦 Movement
+
+| Acción | Endpoint | Roles permitidos | Requiere Token |
+|--------|-----------|------------------|----------------|
+| Ver movimientos por organización | `GET /api/Movement/MyMovements/{OrgId}` | Owner, Admin, Viewer | Sí |
+| Crear movimiento | `POST /api/Movement/Create/{OrgId}` | Owner, Admin | Sí |
+| Calcular balance | `GET /api/Movement/CalculateBalance/{OrgId}` | Owner, Admin, Viewer | Sí |
+| Actualizar movimiento | `PUT /api/Movement/Update/{OrgId}/{NoMov}` | Owner, Admin | Sí |
+| Eliminar movimiento | `DELETE /api/Movement/Delete/{OrgId}/{NoMov}` | Owner, Admin | Sí |
+| Eliminar todos los movimientos | `DELETE /api/Movement/DeleteAllMovements/{OrgId}` | Owner | Sí |
 
 **Roles soportados:**
 - `Owner`
@@ -170,9 +172,12 @@ Desarrollo de esta práctica desde cero para reforzar conceptos de:
 2. La responsabilidad de cada capa.
 3. La forma segura en que se autentica y autoriza el acceso.
 
-📅 **Ultimas novedades:** 
+📅 **Historial de novedades:** 
 1. Se desarrollo la API REST con 33 repositorios y 18 endpoints, subiendolo a GitHub el día 06/11/2025
 2. Se implemento una enpoint faltante, quedando en total 19 endpoints, se implemento caché con middleware y documentacion el día 07/11/2025
+
+📣**Ultimas novedades:** 
+1. Se implemento dos endpoints (Actualizar Password para el USUARIO y Obtener un listado de Organizaciones en las que el USUARIO se encuentra afilidado) el día 13/11/2025
 
 ---
 
