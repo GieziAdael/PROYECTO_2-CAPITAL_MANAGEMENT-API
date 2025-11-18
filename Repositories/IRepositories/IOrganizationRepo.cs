@@ -60,7 +60,7 @@ namespace API_CAPITAL_MANAGEMENT.Repositories.IRepositories
 
 
         /// <summary>
-        /// 
+        /// Return list of organizations I am affiliated with
         /// </summary>
         /// <param name="OrgId"></param>
         /// <returns></returns>

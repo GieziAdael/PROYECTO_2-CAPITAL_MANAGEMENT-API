@@ -120,7 +120,7 @@ namespace API_CAPITAL_MANAGEMENT.Repositories
         }
 
         /// <summary>
-        /// Devolver lista de organizaciones en las que me encuentro afilidado
+        /// Return list of organizations I am affiliated with
         /// </summary>
         /// <param name="OrgId"></param>
         /// <returns></returns>

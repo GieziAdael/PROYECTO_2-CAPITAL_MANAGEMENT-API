@@ -174,7 +174,7 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
         public async Task<IActionResult> ModifyMyPassword(string newPassword)
         {
             //Verifications
-            if (string.IsNullOrEmpty(newPassword))
+            if (string.IsNullOrWhiteSpace(newPassword))
                 return BadRequest("La nueva contraseña es requerida");
             if (newPassword.Length < 8)
                 return BadRequest("La nueva contraseña debe tener al menos 8 caracteres");

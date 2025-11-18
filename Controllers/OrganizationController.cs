@@ -77,7 +77,7 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Find organizations I am affiliated with
         /// </summary>
         /// <returns></returns>
         [Authorize]
