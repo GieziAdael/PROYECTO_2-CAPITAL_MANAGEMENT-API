@@ -175,9 +175,10 @@ Desarrollo de esta práctica desde cero para reforzar conceptos de:
 📅 **Historial de novedades:** 
 1. Se desarrollo la API REST con 33 repositorios y 18 endpoints, subiendolo a GitHub el día 06/11/2025
 2. Se implemento una enpoint faltante, quedando en total 19 endpoints, se implemento caché con middleware y documentacion el día 07/11/2025
+3. Se implemento dos endpoints (Actualizar Password para el USUARIO y Obtener un listado de Organizaciones en las que el USUARIO se encuentra afilidado) el día 13/11/2025
 
 📣**Ultimas novedades:** 
-1. Se implemento dos endpoints (Actualizar Password para el USUARIO y Obtener un listado de Organizaciones en las que el USUARIO se encuentra afilidado) el día 13/11/2025
+1. Se agrego documentacion visual y grafica, un archivo .excalidraw el día 25/11/25
 
 ---
 
