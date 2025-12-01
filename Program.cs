@@ -104,7 +104,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy(PolicyNames.AllowSpecificOrigin,
         builder =>
         {
-            builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+            builder.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader();
         });
 });
 
