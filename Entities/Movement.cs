@@ -28,7 +28,7 @@ namespace API_CAPITAL_MANAGEMENT.Entities
         /// </summary>
         [Required]
         [StringLength(250)]
-        public required string DescriptMov { get; set; }
+        public string? DescriptMov { get; set; }
         /// <summary>
         /// Property representing the type of the movement (Ingreso or Egreso).
         /// </summary>

@@ -1,4 +1,5 @@
-﻿using API_CAPITAL_MANAGEMENT.Entities;
+﻿using API_CAPITAL_MANAGEMENT.Domain_Services.IServices;
+using API_CAPITAL_MANAGEMENT.Entities;
 using API_CAPITAL_MANAGEMENT.Entities.Dtos;
 using API_CAPITAL_MANAGEMENT.Repositories.IRepositories;
 using AutoMapper;
@@ -31,6 +32,8 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
         private readonly IMovementRepo _movementRepo;
         private readonly IMapper _mapper;
 
+        private readonly IUserService _userService;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UserController"/> class with the specified repositories and
         /// mapper.
@@ -40,14 +43,18 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
         /// <param name="employeeRepo">The repository used to manage employee data.</param>
         /// <param name="movementRepo">The repository used to manage movement data.</param>
         /// <param name="mapper">The mapper used for object-to-object mapping.</param>
+        /// <param name="userService"></param>
         public UserController
-            (IUserRepo userRepo, IOrganizationRepo organizationRepo, IEmployeeRepo employeeRepo, IMovementRepo movementRepo, IMapper mapper)
+            (IUserRepo userRepo, IOrganizationRepo organizationRepo, IEmployeeRepo employeeRepo, IMovementRepo movementRepo, IMapper mapper,
+            IUserService userService)
         {
             _userRepo = userRepo;
             _organizationRepo = organizationRepo;
             _employeeRepo = employeeRepo;
             _movementRepo = movementRepo;
             _mapper = mapper;
+
+            _userService = userService;
         }
 
         //[Authorize]
@@ -83,42 +90,20 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> RegisterUser([FromBody] FB_CreateUserDto userRegisterDto)
         {
-            //Rules and validations
-            //Email or Password cannot be empty
-            if (string.IsNullOrEmpty(userRegisterDto.Email) || string.IsNullOrEmpty(userRegisterDto.Password))
-                return BadRequest("El Email y Password son requeridos");
-            //Email valid format
-            if (!new EmailAddressAttribute().IsValid(userRegisterDto.Email))
-                return BadRequest("El formato del Email es inválido");
-            //Exists email
-            if (await _userRepo.ExistsByEmail(userRegisterDto.Email.ToLower().Trim().Normalize()))
-                return BadRequest("El Email ya se encuentra en uso");
-            //Password must be longer than 7 characters
-            if (userRegisterDto.Password.Length < 8)
-                return BadRequest("La contraseña debe tener al menos 8 caracteres");
-            //The email must be less than 350 characters
-            if (userRegisterDto.Email.Length > 350)
-                return BadRequest("El Email no debe exceder los 350 caracteres");
-
-            //Actions
-            var newUser = new User
+            try
             {
-                EmailNormalized = userRegisterDto.Email,
-                PasswordHash = userRegisterDto.Password
-            };
-            var register = _mapper.Map<User>(newUser);
-            var registerModel = await _userRepo.NewUser(register);
-
-            if (!await _userRepo.ExistsByEmail(userRegisterDto.Email.ToLower().Trim().Normalize()))
-            {
-                return BadRequest("Error al registrar el usuario");
+                var user = await _userService.RegisterUserAsync(userRegisterDto);
+                return Created("GetById", new
+                {
+                    Id = user.Id,
+                    Email = user.EmailNormalized,
+                    Message = "Usuario registrado exitosamente"
+                });
             }
-            return Created("GetById", new
+            catch (Exception ex)
             {
-                Id = register.Id,
-                Email = register.EmailNormalized,
-                Message = "Usuario registrado exitosamente"
-            });
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -142,19 +127,16 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> LoginUser([FromBody] UserLoginDto userLoginDto)
         {
-            //Rules and validations
-            //Email or Password cannot be empty
-            if (string.IsNullOrEmpty(userLoginDto.Email) || string.IsNullOrEmpty(userLoginDto.Password))
-                return BadRequest("El Email y Password son requeridos");
-
-            //Actions
-            var user = await _userRepo.Login(userLoginDto);
-            if (user.User == null)
+            try
             {
-                return Unauthorized(user.Message);
+                var user = await _userService.LoginUserAsync(userLoginDto);
+                return Ok(user);
+            }catch(Exception ex)
+            {
+                if(ex.ToString() != "El Email y Password son requeridos")
+                    return BadRequest(ex.Message);
+                return Unauthorized(ex.Message);
             }
-
-            return Ok(user);
         }
 
         /// <summary>
@@ -173,20 +155,15 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ModifyMyPassword(string newPassword)
         {
-            //Verifications
-            if (string.IsNullOrWhiteSpace(newPassword))
-                return BadRequest("La nueva contraseña es requerida");
-            if (newPassword.Length < 8)
-                return BadRequest("La nueva contraseña debe tener al menos 8 caracteres");
-            int tokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
-            var user = await _userRepo.GetById(tokenId);
-            if (user == null)
-                return BadRequest("Usuario no encontrado");
-            //Actions
-            user.PasswordHash = newPassword;
-            if (!await _userRepo.ActUserPassword(user))
-                return BadRequest("Error al modificar la contraseña");
-            return Ok(user);
+            try
+            {
+                int tokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
+                var user = await _userService.ModifyPasswordUserAsync(newPassword, tokenId);
+                return Ok(user);
+            }catch(Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         /// <summary>
@@ -202,42 +179,18 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
         [HttpDelete("DeleteMyAccount")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DeleteMyAccount()
         {
-            int tokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
-            var user = await _userRepo.GetById(tokenId);
-            if (user == null)
-                return BadRequest("Usuario no encontrado");
-            //Delete all movements, employees and organizations related to the user
-            var organizations = await _organizationRepo.GetAllMyOrginations(tokenId);
-            foreach (var orgs in organizations)
+            try
             {
-                var employees = await _employeeRepo.GetMembersByOrganizationId(orgs.Id);
-                foreach (var emp in employees)
-                {
-                    await _employeeRepo.DeleteEmployeeToOrg(emp);
-                }
-                var movements = await _movementRepo.GetAllMovements(orgs.Id);
-                foreach (var mov in movements)
-                {
-                    await _movementRepo.DeleteMov(mov);
-                }
-                await _organizationRepo.DeleteOrg(orgs);
-            }
-            //Remove me from the employees
-            var meEmployee = await _employeeRepo.SearchMeById(tokenId);
-            if(meEmployee is not null)
-                foreach (var emp in meEmployee)
-                {
-                    await _employeeRepo.DeleteEmployeeToOrg(emp);
-                }
-
-            //Finally delete the user
-            if (!await _userRepo.DeleteUser(user))
+                int tokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
+                await _userService.DeleteMyAccountAsync(tokenId);
+                return NoContent();
+            }catch(Exception ex)
             {
-                return BadRequest("Error al eliminar el usuario");
+                return BadRequest(ex);
             }
-            return Ok("Cuenta eliminada exitosamente");
         }
     }
 }

@@ -1,5 +1,7 @@
 using API_CAPITAL_MANAGEMENT.Constants;
 using API_CAPITAL_MANAGEMENT.Data;
+using API_CAPITAL_MANAGEMENT.Domain_Services;
+using API_CAPITAL_MANAGEMENT.Domain_Services.IServices;
 using API_CAPITAL_MANAGEMENT.Repositories;
 using API_CAPITAL_MANAGEMENT.Repositories.IRepositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,10 +32,16 @@ builder.Services.AddScoped<IOrganizationRepo, OrganizationRepo>();
 builder.Services.AddScoped<IEmployeeRepo, EmployeeRepo>();
 builder.Services.AddScoped<IMovementRepo, MovementRepo>();
 
-//4 AutoMapper
+//4 Services
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IOrganizationService, OrganizationService>();
+builder.Services.AddScoped<IMovementService, MovementService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+
+//5 AutoMapper
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
-//5 Token
+//6 Token
 var secretKey = builder.Configuration.GetValue<string>("ApiSettings:SecretKey");
 
 if (string.IsNullOrEmpty(secretKey))
@@ -63,7 +71,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddEndpointsApiExplorer();
-// 6 Swagger with JWT and Documentation XML
+// 7 Swagger with JWT and Documentation XML
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -98,7 +106,7 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(rutaArchivo);
 });
 
-// 7 CORS
+// 8 CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(PolicyNames.AllowSpecificOrigin,

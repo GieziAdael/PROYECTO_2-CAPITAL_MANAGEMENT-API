@@ -1,4 +1,5 @@
 ﻿using API_CAPITAL_MANAGEMENT.Data;
+using API_CAPITAL_MANAGEMENT.Domain_Services.IServices;
 using API_CAPITAL_MANAGEMENT.Entities;
 using API_CAPITAL_MANAGEMENT.Entities.Dtos;
 using API_CAPITAL_MANAGEMENT.Repositories;
@@ -8,7 +9,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Win32;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace API_CAPITAL_MANAGEMENT.Controllers
 {
@@ -32,21 +35,25 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
         private readonly IEmployeeRepo _employeeRepo;
         private readonly IMovementRepo _movementRepo;
         private readonly IMapper _mapper;
+        private readonly IOrganizationService _organizationService;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OrganizationController"/> class.
+        /// 
         /// </summary>
-        /// <param name="organizationRepo">The repository used to manage organization-related data.</param>
-        /// <param name="employeeRepo">The repository used to manage employee-related data.</param>
-        /// <param name="movementRepo">The repository used to manage movement-related data.</param>
-        /// <param name="mapper">The object mapper used to map between domain models and DTOs.</param>
+        /// <param name="organizationRepo"></param>
+        /// <param name="employeeRepo"></param>
+        /// <param name="movementRepo"></param>
+        /// <param name="mapper"></param>
+        /// <param name="organizationService"></param>
         public OrganizationController
-            (IOrganizationRepo organizationRepo,IEmployeeRepo employeeRepo, IMovementRepo movementRepo ,IMapper mapper)
+            (IOrganizationRepo organizationRepo,IEmployeeRepo employeeRepo, IMovementRepo movementRepo ,IMapper mapper,
+            IOrganizationService organizationService)
         {
             _organizationRepo = organizationRepo;
             _employeeRepo = employeeRepo;
             _movementRepo = movementRepo;
             _mapper = mapper;
+            _organizationService = organizationService;
         }
 
         /// <summary>
@@ -66,14 +73,16 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAllOrganizations()
         {
-            int TokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
-
-            var organizations = await _organizationRepo.GetAllMyOrginations(TokenId);
-            var organizationsDto = _mapper.Map<List<FB_ListOrganizationsDto>>(
-                organizations,
-                opt => opt.Items["UserId"] = TokenId
-            );
-            return Ok(organizationsDto);
+            try
+            {
+                int tokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
+                var organization = await _organizationService.MyOrganizations(tokenId);
+                return Ok(organization);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -87,15 +96,17 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetOtherOrganizations()
         {
-            int TokenId = int.Parse(User.FindFirst("id")?.Value?? "0");
+            try
+            {
 
-            //Get all organizations by OrganizationId
-            var organizations = await _organizationRepo.GetAllOthersOrganizationsByOrgId(TokenId);
-            var organizationsDto = _mapper.Map<List<FB_ListOrganizationsDto>>(
-                organizations,
-                opt => opt.Items["UserId"] = TokenId
-            );
-            return Ok(organizationsDto);
+                int tokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
+                var organizations = await _organizationService.OrganizationsAfilied(tokenId);
+                return Ok(organizations);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
         }
 
@@ -120,115 +131,25 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> RegisterUser([FromBody] FB_CreateOrgDto createOrgDto)
+        public async Task<IActionResult> RegisterOrganization([FromBody] FB_CreateOrgDto createOrgDto)
         {
-            //Rules and validations
-            //Name or Password cannot be empty
-            if (string.IsNullOrEmpty(createOrgDto.NameOrganization) || string.IsNullOrEmpty(createOrgDto.PasswordOrganization))
-                return BadRequest("El Nombre y Password son requeridos");
-            //Exists Name
-            if (await _organizationRepo.ExistsOrgByName(createOrgDto.NameOrganization))
-                return BadRequest($"El Nombre '{createOrgDto.NameOrganization}' ya se encuentra en uso");
-            //Password must be longer than 7 characters
-            if (createOrgDto.PasswordOrganization.Length < 8)
-                return BadRequest("La contraseña debe tener al menos 8 caracteres");
-            //The Name must be less than 150 characters
-            if (createOrgDto.NameOrganization.Length > 150)
-                return BadRequest("El Nombre no debe exceder los 150 caracteres");
-
-            //Actions
-            //Create Organization
-
-            int tokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
-
-            var newOrganization = new Organization
+            try
             {
-                NameOrg = createOrgDto.NameOrganization,
-                PasswordOrgHash = createOrgDto.PasswordOrganization,
-                UserId = tokenId
-            };
-            var register = _mapper.Map<Organization>(newOrganization);
-            var registerModel = await _organizationRepo.NewOrganitation(register);
-
-            if (!await _organizationRepo.ExistsOrgByName(createOrgDto.NameOrganization))
-            {
-                return BadRequest("Error al registrar la Organizacion");
+                int tokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
+                var organization = await _organizationService.CreateOrganization(createOrgDto, tokenId);
+                return Created("GetOrganizationById", new
+                {
+                    Id = organization.Id,
+                    NameOrg = organization.NameOrg,
+                    OwnerId = organization.UserId,
+                    Message = "Se ha creado la organizacion ;)"
+                });
             }
-
-            //Create Owner Organization Role
-            var newOwnerOrg = new Employee
+            catch (Exception ex)
             {
-                Role = "Owner",
-                UserId = tokenId,
-                OrganizationId = register.Id
-            };
-            var registerE = _mapper.Map<Employee>(newOwnerOrg);
-            var registerModelE = await _employeeRepo.NewEmployeeToOrg(registerE);
-
-            return Created("GetById", new
-            {
-                IdOrg = register.Id,
-                NameOrg = register.NameOrg,
-                Message = "Organizacion registrada exitosamente",
-                IdEmployee = registerE.Id,
-                Role = registerE.UserId,
-                OrgId = registerE.OrganizationId,
-                Message2 = $"Te asignaste como {newOwnerOrg.Role} en tu organizacion llamada {register.NameOrg}"
-
-            });
+                return BadRequest(ex.Message);
+            }
         }
-
-        /// <summary>
-        /// Updates the password for the specified organization.
-        /// </summary>
-        /// <remarks>This method requires the user to be authorized and to have the "Owner" role for the
-        /// specified organization.  The user must also belong to the organization being updated. If the organization
-        /// does not exist, or if the  user does not have the required permissions, the method will return a bad request
-        /// response.</remarks>
-        /// <param name="orgId">The unique identifier of the organization whose password is being updated. Must be greater than 0.</param>
-        /// <param name="newPassword">The new password to set for the organization. Must be at least 8 characters long.</param>
-        /// <returns>An <see cref="IActionResult"/> indicating the result of the operation.  Returns <see
-        /// cref="StatusCodes.Status200OK"/> if the password is successfully updated, or  <see
-        /// cref="StatusCodes.Status400BadRequest"/> if the input is invalid or the operation fails.</returns>
-        [Authorize]
-        [HttpPut("UpdatePassword/{orgId:int}/{newPassword}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateOrgPassword(int orgId, string newPassword)
-        {
-            //Rules and validations
-            if(orgId <= 0)
-                return BadRequest("El Id de la organización es inválido");
-            if (string.IsNullOrEmpty(newPassword))
-                return BadRequest("La nueva contraseña es requerida");
-            if (newPassword.Length < 8)
-                return BadRequest("La nueva contraseña debe tener al menos 8 caracteres");
-            if (!await _organizationRepo.ExistsOrgById(orgId))
-                return BadRequest("La organización no existe");
-
-            //Is the user owner of the organization?
-            int tokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
-            var employee = await _employeeRepo.GetByIdUserEmployee(tokenId, orgId);
-            if(employee == null)
-                return BadRequest("No se encontro dicha organizacion");
-            if (employee.Role != "Owner")
-                return BadRequest("No tienes permisos para actualizar la contraseña de esta organización");
-
-            //Actions
-            var registro = await _organizationRepo.GetOrganizationById(orgId);
-            if(registro == null)
-                return BadRequest("La organización no existe");
-
-            var organization = _mapper.Map<Organization>(registro);
-            organization.Id = orgId;
-            organization.PasswordOrgHash = newPassword;
-
-            if (! await _organizationRepo.PatchOrg(organization))
-                return BadRequest("Error al actualizar la contraseña de la organización");
-
-            return Ok("Actualizado ;)");
-        }
-
         /// <summary>
         /// Authenticates an organization based on the provided credentials.
         /// </summary>
@@ -246,23 +167,46 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> LoginOrg([FromBody] FB_CreateOrgDto fB_LoginOrgDto)
         {
-            //Rules and validations
-            if (string.IsNullOrEmpty(fB_LoginOrgDto.NameOrganization) || string.IsNullOrEmpty(fB_LoginOrgDto.PasswordOrganization))
-                return BadRequest("El Nombre y Password son requeridos");
+            try
+            {
+                int tokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
+                var organization = await _organizationService.LoginOrganization(fB_LoginOrgDto, tokenId);
+                return Ok(organization);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
-            var organization = await _organizationRepo.GetOrganization(fB_LoginOrgDto.NameOrganization, fB_LoginOrgDto.PasswordOrganization);
-            if (organization == null)
-                return BadRequest("Nombre o contraseña incorrectos");
-            //Actions
-
-            int tokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
-
-            var employee = await _employeeRepo.IsMember(tokenId, organization.Id);
-
-            if (!employee)
-                return BadRequest("No eres miembro de esta organización");
-
-            return Ok(organization);
+        /// <summary>
+        /// Updates the password for the specified organization.
+        /// </summary>
+        /// <remarks>This method requires the user to be authorized and to have the "Owner" role for the
+        /// specified organization.  The user must also belong to the organization being updated. If the organization
+        /// does not exist, or if the  user does not have the required permissions, the method will return a bad request
+        /// response.</remarks>
+        /// <param name="orgId">The unique identifier of the organization whose password is being updated. Must be greater than 0.</param>
+        /// <param name="newPassword">The new password to set for the organization. Must be at least 8 characters long.</param>
+        /// <returns>An <see cref="IActionResult"/> indicating the result of the operation.  Returns <see
+        /// cref="StatusCodes.Status200OK"/> if the password is successfully updated, or  <see
+        /// cref="StatusCodes.Status400BadRequest"/> if the input is invalid or the operation fails.</returns>
+        [Authorize]
+        [HttpPut("UpdatePassword/{orgId:int}/{newPassword}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UpdateOrgPassword(int orgId, string newPassword)
+        {
+            try
+            {
+                int tokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
+                await _organizationService.UpdatePasswordOrganization(orgId, newPassword, tokenId);
+                return NoContent();
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -283,41 +227,15 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteOrganization(int orgId)
         {
-            //Rules and validations
-            if (orgId <= 0)
-                return BadRequest("El Id de la organización es inválido");
-            if (!await _organizationRepo.ExistsOrgById(orgId))
-                return BadRequest("La organización no existe");
-            //Is the user owner of the organization?
-            int tokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
-            var employee = await _employeeRepo.GetByIdUserEmployee(tokenId, orgId);
-            if (employee == null)
-                return BadRequest("No se encontro el empleado");
-            if (employee.Role != "Owner")
-                return BadRequest("No tienes permisos para eliminar esta organización");
-            //Actions
-            var registro = await _organizationRepo.GetOrganizationById(orgId);
-            if (registro == null)
-                return BadRequest("La organización no existe");
-            //Delete Employees associated with the organization
-            var employees = await _employeeRepo.GetMembersByOrganizationId(orgId);
-            foreach (var emp in employees)
+            try
             {
-                await _employeeRepo.DeleteEmployeeToOrg(emp);
-            }
-            //Delete Movements associated with the organization
-            var movements = await _movementRepo.GetAllMovements(orgId);
-            foreach (var mov in movements)
+                int tokenId = int.Parse(User.FindFirst("id")?.Value ?? "0");
+                await _organizationService.DeleteOrganization(orgId, tokenId);
+                return NoContent();
+            }catch(Exception ex)
             {
-                await _movementRepo.DeleteMov(mov);
+                return BadRequest(ex.Message);
             }
-
-            //Delete Organization
-            var organization = _mapper.Map<Organization>(registro);
-            organization.Id = orgId;
-            if (!await _organizationRepo.DeleteOrg(organization))
-                return BadRequest("Error al eliminar la organización");
-            return Ok($"Organización con Id {orgId} eliminada exitosamente");
         }
 
         ////Token

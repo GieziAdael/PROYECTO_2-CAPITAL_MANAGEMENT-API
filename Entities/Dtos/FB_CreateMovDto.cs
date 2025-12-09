@@ -13,9 +13,9 @@ namespace API_CAPITAL_MANAGEMENT.Entities.Dtos
         /// </summary>
         public required string TitleMov { get; set; }
         /// <summary>
-        /// Property representing the description of the movement.
+        /// 
         /// </summary>
-        public required string DescriptMov { get; set; }
+        public string? DescriptMov { get; set; }
         /// <summary>
         /// Property representing the type of the movement.
         /// </summary>

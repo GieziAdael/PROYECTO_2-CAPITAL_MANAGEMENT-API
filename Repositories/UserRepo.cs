@@ -147,7 +147,7 @@ namespace API_CAPITAL_MANAGEMENT.Repositories
                     new Claim("id", user.Id.ToString()),
                     new Claim("email", user.EmailNormalized),
                 }),
-                Expires = DateTime.UtcNow.AddHours(2),
+                Expires = DateTime.UtcNow.AddMinutes(15),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = handlerToken.CreateToken(tokenDescriptor);
