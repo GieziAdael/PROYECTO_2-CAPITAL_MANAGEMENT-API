@@ -181,6 +181,8 @@ Desarrollo de esta práctica desde cero para reforzar conceptos de:
 📣**Ultimas novedades:** 
 1. Se agrego una capa de Servicios, quedando un proyecto de API REST mas profesional y mejor organizada 09/12/2025
 
+📅**Proximament:** 
+1. Agregar un Hub para WebSockets, chat en tiempo real para empleados de la organizacion - Fecha prevista de lanzamiento (a mediadios - finales Diciembre)
 ---
 
 ## 🧑‍💻 Autor
