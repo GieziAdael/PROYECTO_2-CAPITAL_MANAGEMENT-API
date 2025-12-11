@@ -177,12 +177,13 @@ Desarrollo de esta práctica desde cero para reforzar conceptos de:
 2. Se implemento una enpoint faltante, quedando en total 19 endpoints, se implemento caché con middleware y documentacion el día 07/11/2025
 3. Se implemento dos endpoints (Actualizar Password para el USUARIO y Obtener un listado de Organizaciones en las que el USUARIO se encuentra afilidado) el día 13/11/2025
 4. Se agrego documentacion visual y grafica, un archivo .excalidraw el día 25/11/25
+5. Se agrego una capa de Servicios, quedando un proyecto de API REST mas profesional y mejor organizada 09/12/2025
 
 📣**Ultimas novedades:** 
-1. Se agrego una capa de Servicios, quedando un proyecto de API REST mas profesional y mejor organizada 09/12/2025
+1. Se agrego un ChatHub, integrando por primera vez la comunicación bidirecciónal en tiempo real mediante WebSockets, usando SignalR, implementando MongoDB y compatibilidad con JWT 11/12/2025
 
 📅**Proximament:** 
-1. Agregar un Hub para WebSockets, chat en tiempo real para empleados de la organizacion - Fecha prevista de lanzamiento (a mediadios - finales Diciembre)
+1. Versionar la API, orientarlo a una vision de plataforma CheckOut, agregar servicios externos Financieros para realizar pagos como MercadoPago
 ---
 
 ## 🧑‍💻 Autor
