@@ -182,7 +182,7 @@ Desarrollo de esta práctica desde cero para reforzar conceptos de:
 5. Se agrego una capa de Servicios, quedando un proyecto de API REST mas profesional y mejor organizada 09/12/2025
 
 📣**Ultimas novedades:** 
-1. Se agrego un ChatHub, integrando por primera vez la comunicación bidirecciónal en tiempo real mediante WebSockets, usando SignalR, implementando MongoDB y compatibilidad con JWT 11/12/2025
+1. Se agrego un Hub, integrando por primera vez la comunicación bidirecciónal en tiempo real mediante WebSockets, usando SignalR, implementando MongoDB y compatibilidad con JWT 11/12/2025
 
 📅**Proximament:** 
 1. Versionar la API, orientarlo a una vision de plataforma CheckOut, agregar servicios externos Financieros para realizar pagos como MercadoPago
