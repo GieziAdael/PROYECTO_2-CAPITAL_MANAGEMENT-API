@@ -88,10 +88,12 @@ Esta API permite:
 - **C# 12**
 - **Entity Framework Core**
 - **SQL Server LocalDB**
+- **MongoDb LocalDB**
 - **AutoMapper**
 - **JWT Bearer Authentication**
 - **Swagger / Postman**
 - **BCrypt**
+- **WebSockets mediante SignalR**
 
 ---
 
