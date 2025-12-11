@@ -2,6 +2,9 @@ using API_CAPITAL_MANAGEMENT.Constants;
 using API_CAPITAL_MANAGEMENT.Data;
 using API_CAPITAL_MANAGEMENT.Domain_Services;
 using API_CAPITAL_MANAGEMENT.Domain_Services.IServices;
+using API_CAPITAL_MANAGEMENT.Hubs;
+using API_CAPITAL_MANAGEMENT.Hubs.Services;
+using API_CAPITAL_MANAGEMENT.Hubs.Services.IServices;
 using API_CAPITAL_MANAGEMENT.Repositories;
 using API_CAPITAL_MANAGEMENT.Repositories.IRepositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -38,6 +41,10 @@ builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<IMovementService, MovementService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
+// 8 SignalR Services
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<MessageService>();
+
 //5 AutoMapper
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
@@ -63,7 +70,26 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
         ValidateIssuer = false,
-        ValidateAudience = false
+        ValidateAudience = false,
+        NameClaimType = "email"
+    };
+    //SIGNALR
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+
+            var path = context.HttpContext.Request.Path;
+
+            if (!string.IsNullOrEmpty(accessToken) &&
+                path.StartsWithSegments("/chat"))
+            {
+                context.Token = accessToken;
+            }
+
+            return Task.CompletedTask;
+        }
     };
 });
 
@@ -106,17 +132,23 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(rutaArchivo);
 });
 
-// 8 CORS
+
+
+
+// 9 CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(PolicyNames.AllowSpecificOrigin,
-        builder =>
-        {
-            builder.AllowAnyOrigin()
-           .AllowAnyMethod()
-           .AllowAnyHeader();
-        });
+    options.AddPolicy("AllowMvc",
+        p => p.WithOrigins("https://localhost:7204",
+                    "https://distinct-insolvably-lilianna.ngrok-free.dev",
+                    "https://twiggier-undefensively-taunya.ngrok-free.dev/chat"
+                )
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials()
+              .WithExposedHeaders("Authorization"));
 });
+
 
 var app = builder.Build();
 
@@ -124,13 +156,19 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
+
 app.UseHttpsRedirection();
 
-app.UseCors(PolicyNames.AllowSpecificOrigin);
+//CORS 
+app.UseCors("AllowMvc");
+
 app.UseResponseCaching();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseWebSockets();
+
+app.MapHub<ChatHub>("/chat");
 
 app.MapControllers();
 
