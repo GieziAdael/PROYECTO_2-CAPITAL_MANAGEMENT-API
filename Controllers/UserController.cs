@@ -162,7 +162,7 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
                 return Ok(user);
             }catch(Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(ex.Message);
             }
         }
 
@@ -189,7 +189,7 @@ namespace API_CAPITAL_MANAGEMENT.Controllers
                 return NoContent();
             }catch(Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(ex.Message);
             }
         }
     }
